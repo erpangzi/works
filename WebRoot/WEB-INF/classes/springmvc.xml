@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:mvc="http://www.springframework.org/schema/mvc" 
+       xmlns:context="http://www.springframework.org/schema/context" 
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	   					   http://www.springframework.org/schema/mvc 
+	   					   http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	   					   http://www.springframework.org/schema/context 
+	   					   http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+	   					   ">
+
+
+
+
+
+
+		<!-- 扫描controller所在的包 -->
+		<context:component-scan base-package="zpark.controller"/>
+
+		<!-- 处理器映射器 -->
+		<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+		
+		<!-- 处理器适配器 -->
+		<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" >
+			<property name="webBindingInitializer" ref="webBindingInitializer"/>
+		</bean>
+		
+		
+		<!-- 视图解析器 -->
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+			<!-- 前缀 -->
+			<property name="prefix" value="/"></property>
+			<!-- 后缀 -->
+			<property name="suffix" value=".jsp"></property>
+		</bean>
+			
+		<!-- 创建自定义参数绑定器 -->	
+		<bean id="customerDataEditor" class="zpark.controller.CustomerDataEditor"/>
+			
+		<!-- 创建参数绑定器 -->
+		<bean id="webBindingInitializer" class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+			<property name="propertyEditorRegistrars">
+				<list>
+			
+						<ref bean="customerDataEditor"/>
+
+				</list>
+			</property>
+		</bean>
+		
+		<!-- 文件上传配置 -->
+		<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" >
+			<!-- 默认上传没有限制    这里修改成200M-->
+			<property name="maxUploadSize" value="209715200"/>
+			<!-- 服务器的相对路径(tomcat) -->
+			<property name="uploadTempDir" value="upload"/>
+		</bean>
+		
+		<!-- 解决springmvc web.xml 中配置为"/" ,会导致静态资源拦截的处理
+			img目录下的所有都不会被拦截-->
+		<mvc:resources location="/img/**" mapping="/img/**"/>
+		
+		
+	   </beans>
